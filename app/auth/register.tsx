@@ -1,23 +1,68 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import EmailIcon from '@/assets/icon/email.svg';
-import PassIcon from '@/assets/icon/pass.svg';
-import GoogleIcon from '@/assets/icon/google.svg';
-import ShopIcon from '@/assets/icon/shop.svg';
-import FBIcon from '@/assets/icon/facebook.svg';
-import EyesOnIcon from '@/assets/icon/eyes-on.svg';
 import EyesOffIcon from '@/assets/icon/eyes-off.svg';
-import { View, Image, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { useState } from 'react';
-import { GlobalText, GlobalText as Text } from '@/components/text/text_Regular';
-import { router } from 'expo-router';
+import EyesOnIcon from '@/assets/icon/eyes-on.svg';
+import FBIcon from '@/assets/icon/facebook.svg';
+import GoogleIcon from '@/assets/icon/google.svg';
+import PassIcon from '@/assets/icon/pass.svg';
+import ShopIcon from '@/assets/icon/shop.svg';
 
+import { GlobalText, GlobalText as Text } from '@/components/text/text_Regular';
+import { registerUser } from '@/src/service/authservice';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Image, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+
+import { useFcmToken } from '@/src/hooks/usefcmtoken';
 import { styles } from '../../src/styles/register.style';
 
 export default function LoginScreen() {
   const [secure, setSecure] = useState(true);
 
+   const [nama, setNama] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+const fcmToken = useFcmToken();
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 500; 
+
+  
+const handleRegister = async () => {
+    if (!nama || !email || !password) {
+      Alert.alert("Error", "Semua field harus diisi");
+      return;
+    }
+
+    try {
+      const res = await registerUser({
+        nama,
+        email,
+        password,
+        deskripsi: "test",
+        fcmToken: fcmToken || "dummy-token", // Fallback jika token belum load
+      });
+
+      console.log("Register Response:", res);
+
+      // Asumsi: Backend mengembalikan { success: true, data: { loginId: "123" } }
+      // Sesuaikan 'res.data.loginId' dengan struktur JSON backendmu yang asli
+      if (res.success || res.loginId) { 
+        
+        // KIRIM loginId KE HALAMAN OTP
+        router.push({
+          pathname: "/auth/otp",
+          params: { loginId: res.data?.loginId || res.loginId } 
+        });
+
+      } else {
+        Alert.alert("Gagal", res.message || "Registrasi gagal");
+      }
+
+    } catch (err: any) {
+      Alert.alert("Error", err.message);
+    }
+  };
+
 
   return (
     <View style={[styles.container, isSmallScreen && styles.containerMobile]}>
@@ -41,12 +86,12 @@ export default function LoginScreen() {
 
         <View style={[styles.inputWrapper1, isSmallScreen && styles.inputWrapperMobile]}>
           <ShopIcon width={28} height={28} />
-          <TextInput placeholder="Nama Toko" placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
+          <TextInput placeholder="Nama Toko" value={nama} onChangeText={setNama} placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
         </View>
 
         <View style={[styles.inputWrapper1, isSmallScreen && styles.inputWrapperMobile]}>
           <EmailIcon width={28} height={28} />
-          <TextInput placeholder="Email Address" placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
+          <TextInput placeholder="Email Address" value={email} onChangeText={setEmail} placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
         </View>
 
         <View style={[styles.inputWrapper2, isSmallScreen && styles.inputWrapperMobile]} >
@@ -55,6 +100,8 @@ export default function LoginScreen() {
             <TextInput
               placeholder="Kata Sandi"
               secureTextEntry={secure}
+              value={password}
+              onChangeText={setPassword}
               placeholderTextColor="#0000006f"
               style={[styles.input, isSmallScreen && styles.inputMobile]}
             />
@@ -76,7 +123,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/auth/otp')}>
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Daftar</Text>
         </TouchableOpacity>
 
