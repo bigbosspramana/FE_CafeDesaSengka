@@ -49,7 +49,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Text> */}
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/auth/otp')}>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/order_menu')}>
           <Text style={styles.buttonText}>Verifikasi</Text>
         </TouchableOpacity>
 
