@@ -1,0 +1,123 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  main: {
+    position: "fixed",
+    left: 260,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    padding: 30,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  title: { fontSize: 28, fontWeight: 700 },
+  search: {
+    backgroundColor: "#fff",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderColor: "#ccc",
+    fontSize: 18,
+    color: "#9C9C9C",
+    fontWeight: 600,
+    borderWidth: 0.16,
+    shadowColor: "#4b4b4bff",
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 1, height: 3 },
+    shadowRadius: 8,
+  },
+  cartWrapper: { position: "relative" },
+  cartBox: {
+    padding: 15,
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    borderColor: "#0000002b",
+    borderWidth: 0.16,
+    shadowColor: "#4b4b4b49",
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 1, height: 3 },
+    shadowRadius: 8,
+  },
+  cartBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "#D73232",
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 50,
+  },
+  cartBadgeText: { color: "#fff", fontSize: 12, fontWeight: 500 },
+  filterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    marginTop: 40,
+    marginBottom: 20,
+  },
+  divider: { width: 1.5, backgroundColor: "#9C9C9C", height: "100%" },
+  filterTag: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 4,
+  },
+  filterText: { fontWeight: 600, color: "#9C9C9C", marginLeft: 10 },
+
+  // Responsive Mobile
+  mainMobile: {
+    position: "relative",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flex: 1,
+  },
+  headerRowMobile: {
+    justifyContent: "space-between",
+  },
+  titleMobile: { fontSize: 20 },
+  searchMobile: {
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    fontSize: 14,
+    marginTop: 10,
+  },
+  optionMobile: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cartWrapperMobile: { position: "relative" },
+  cartBoxMobile: {
+    padding: 15,
+    shadowColor: "#4b4b4b49",
+  },
+  cartBadgeMobile: {
+    paddingVertical: 3,
+    paddingHorizontal: 9,
+  },
+  cartBadgeTextMobile: { fontSize: 11 },
+  filterRowMobile: {
+    marginTop: 20,
+    marginBottom: 20,
+    gap: 15,
+  },
+  filterTagMobile: {
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  profileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  profileName: {
+    fontSize: 20,
+    marginLeft: 10,
+  },
+});

@@ -95,9 +95,12 @@ const [otp, setOtp] = useState("");
             <Text style={styles.registerBold}> Daftar sekarang</Text>
           </TouchableOpacity>
         </Text> */}
-
+Fetching-Login-register
         <TouchableOpacity style={styles.button} onPress={handleVerify} // <--- INI PERBAIKANNYA
             disabled={loading}>
+=======
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/order_menu')}>
+main
           <Text style={styles.buttonText}>Verifikasi</Text>
         </TouchableOpacity>
 
