@@ -1,23 +1,77 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import EmailIcon from '@/assets/icon/email.svg';
-import PassIcon from '@/assets/icon/pass.svg';
-import GoogleIcon from '@/assets/icon/google.svg';
-import FBIcon from '@/assets/icon/facebook.svg';
-import EyesOnIcon from '@/assets/icon/eyes-on.svg';
 import EyesOffIcon from '@/assets/icon/eyes-off.svg';
-import { View, Image, TextInput, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { useState } from 'react';
+import EyesOnIcon from '@/assets/icon/eyes-on.svg';
+import FBIcon from '@/assets/icon/facebook.svg';
+import GoogleIcon from '@/assets/icon/google.svg';
+import PassIcon from '@/assets/icon/pass.svg';
 import { GlobalText, GlobalText as Text } from '@/components/text/text_Regular';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, Image, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 
+import { useFcmToken } from '@/src/hooks/usefcmtoken';
+import { loginUser } from '@/src/service/authservice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../../src/styles/login.style';
 
 export default function LoginScreen() {
   const [secure, setSecure] = useState(true);
 
   const { width } = useWindowDimensions();
+  const fcmToken = useFcmToken();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const isSmallScreen = width < 500; 
 
+ const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Perhatian", "Email dan Kata Sandi harus diisi");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await loginUser({
+        email,
+        password,
+        fcmToken: fcmToken || "dummy-login-token", 
+      });
+
+      console.log("Login Response Full:", JSON.stringify(res, null, 2));
+
+      // PERBAIKAN DISINI:
+      // Karena backend langsung kasih token, kita cek apakah tokennya ada atau tidak.
+      const isSuccess = res.token != null; 
+
+      if (isSuccess) { 
+        // 1. Simpan Data Sesi
+        const userData = JSON.stringify(res); 
+        await AsyncStorage.setItem('userSession', userData);
+        
+        // Simpan token secara spesifik jika perlu (opsional, tapi disarankan)
+        await AsyncStorage.setItem('token', res.token);
+
+        console.log("Login Success, Navigating...");
+        
+        // 2. Pindah Halaman
+        router.replace("/onboarding/onboarding1"); 
+
+      } else {
+        // Jika API merespon tapi tidak ada token (misal: pesan error dari backend)
+        Alert.alert("Gagal Masuk", res.message || "Gagal mendapatkan token akses");
+      }
+
+    } catch (err: any) {
+      console.error("Login Error:", err);
+      Alert.alert("Terjadi Kesalahan", err.message || "Gagal terhubung ke server");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   return (
     <View style={[styles.container, isSmallScreen && styles.containerMobile]}>
       <Image
@@ -40,7 +94,7 @@ export default function LoginScreen() {
 
         <View style={[styles.inputWrapper1, isSmallScreen && styles.inputWrapperMobile]}>
           <EmailIcon width={28} height={28} />
-          <TextInput placeholder="Email Address" placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
+          <TextInput placeholder="Email Address" value={email} onChangeText={setEmail} placeholderTextColor="#0000006f" style={[styles.input, isSmallScreen && styles.inputMobile]} />
         </View>
 
         <View style={[styles.inputWrapper2, isSmallScreen && styles.inputWrapperMobile]} >
@@ -49,6 +103,8 @@ export default function LoginScreen() {
             <TextInput
               placeholder="Kata Sandi"
               secureTextEntry={secure}
+              value={password}
+              onChangeText={setPassword}
               placeholderTextColor="#0000006f"
               style={[styles.input, isSmallScreen && styles.inputMobile]}
             />
@@ -70,10 +126,21 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/auth/otp')}>
-          <Text style={styles.buttonText}>Masuk</Text>
+       <TouchableOpacity 
+            style={[
+                styles.button, 
+                loading && { opacity: 0.7, backgroundColor: '#ccc' } // Style saat loading (opsional)
+            ]} 
+            onPress={handleLogin}
+            disabled={loading} // Cegah klik ganda
+        >
+          {loading ? (
+             <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+             <Text style={styles.buttonText}>Masuk</Text>
+          )}
+          
         </TouchableOpacity>
-
         <View style={[styles.dividerContainer,isSmallScreen && styles.dividerContainerMobile]}>
           <View style={[styles.line, isSmallScreen && styles.lineMobile]} />
           <Text style={[styles.dividerText, isSmallScreen && styles.dividerTextMobile]}>Atau</Text>
